@@ -1,0 +1,8 @@
+<launch>
+    <arg name="repeat_rate" value="1.0" />
+
+    <node name="teleop_keybord" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen">
+        <param name="repeat_rate" value="$(arg repeat_rate)" />
+        <remap from="/cmd_vel" to="/smoother_cmd_vel"/>
+    </node>
+</launch>
