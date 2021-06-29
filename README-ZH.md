@@ -84,28 +84,12 @@ $ sudo usermod -a -G dialout $USER
     ```
     $ cd ~/catkin_ws/src
     $ git clone --recursive https://github.com/agilexrobotics/ugv_sdk.git
-    $ git clone https://github.com/agilexrobotics/bunker_base.git
+    $ git clone https://github.com/agilexrobotics/bunker_ros.git
     $ cd ..
     $ catkin_make
     ```
 
-3. 配置 Webots simulation  环境 
-
-* 安装 Webots R2020a-rev1 (download from https://cyberbotics.com/ )
-
-* 安装 Webots ROS package
-
-    ```
-    $ sudo apt install ros-melodic-webots-ros
-    ```
-
-* 设置 WEBOTS_HOME 变量,把下面这行代码加入到 "~/.bashrc"中
-
-    ```
-    export WEBOTS_HOME=/usr/local/webots
-    ```
-
-4. 启动 ROS nodes
+3. 启动 ROS nodes
  
 * 开始 the base node 
 
