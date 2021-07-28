@@ -31,8 +31,8 @@ namespace westonrobot
     // cmd subscriber
     motion_cmd_subscriber_ = nh_->subscribe<geometry_msgs::Twist>(
         "/cmd_vel", 5, &BunkerROSMessenger::TwistCmdCallback, this);
-    light_cmd_subscriber_ = nh_->subscribe<bunker_msgs::BunkerLightCmd>(
-        "/bunker_light_control", 5, &BunkerROSMessenger::LightCmdCallback, this);
+//    light_cmd_subscriber_ = nh_->subscribe<bunker_msgs::BunkerLightCmd>(
+//        "/bunker_light_control", 5, &BunkerROSMessenger::LightCmdCallback, this);
   }
 
   void BunkerROSMessenger::TwistCmdCallback(
@@ -58,77 +58,77 @@ namespace westonrobot
     angular = current_twist_.angular.z;
   }
 
-  void BunkerROSMessenger::LightCmdCallback(
-      const bunker_msgs::BunkerLightCmd::ConstPtr &msg)
-  {
-    if (!simulated_robot_)
-    {
-      if (msg->enable_cmd_light_control)
-      {
-        BunkerLightCmd cmd;
+//  void BunkerROSMessenger::LightCmdCallback(
+//      const bunker_msgs::BunkerLightCmd::ConstPtr &msg)
+//  {
+//    if (!simulated_robot_)
+//    {
+//      if (msg->enable_cmd_light_control)
+//      {
+//        BunkerLightCmd cmd;
 
-        switch (msg->front_mode)
-        {
-        case bunker_msgs::BunkerLightCmd::LIGHT_CONST_OFF:
-        {
-          cmd.front_mode = BunkerLightCmd::LightMode::CONST_OFF;
-          break;
-        }
-        case bunker_msgs::BunkerLightCmd::LIGHT_CONST_ON:
-        {
-          cmd.front_mode = BunkerLightCmd::LightMode::CONST_ON;
-          break;
-        }
-        case bunker_msgs::BunkerLightCmd::LIGHT_BREATH:
-        {
-          cmd.front_mode = BunkerLightCmd::LightMode::BREATH;
-          break;
-        }
-        case bunker_msgs::BunkerLightCmd::LIGHT_CUSTOM:
-        {
-          cmd.front_mode = BunkerLightCmd::LightMode::CUSTOM;
-          cmd.front_custom_value = msg->front_custom_value;
-          break;
-        }
-        }
+//        switch (msg->front_mode)
+//        {
+//        case bunker_msgs::BunkerLightCmd::LIGHT_CONST_OFF:
+//        {
+//          cmd.front_mode = BunkerLightCmd::LightMode::CONST_OFF;
+//          break;
+//        }
+//        case bunker_msgs::BunkerLightCmd::LIGHT_CONST_ON:
+//        {
+//          cmd.front_mode = BunkerLightCmd::LightMode::CONST_ON;
+//          break;
+//        }
+//        case bunker_msgs::BunkerLightCmd::LIGHT_BREATH:
+//        {
+//          cmd.front_mode = BunkerLightCmd::LightMode::BREATH;
+//          break;
+//        }
+//        case bunker_msgs::BunkerLightCmd::LIGHT_CUSTOM:
+//        {
+//          cmd.front_mode = BunkerLightCmd::LightMode::CUSTOM;
+//          cmd.front_custom_value = msg->front_custom_value;
+//          break;
+//        }
+//        }
 
-        switch (msg->rear_mode)
-        {
-        case bunker_msgs::BunkerLightCmd::LIGHT_CONST_OFF:
-        {
-          cmd.rear_mode = BunkerLightCmd::LightMode::CONST_OFF;
-          break;
-        }
-        case bunker_msgs::BunkerLightCmd::LIGHT_CONST_ON:
-        {
-          cmd.rear_mode = BunkerLightCmd::LightMode::CONST_ON;
-          break;
-        }
-        case bunker_msgs::BunkerLightCmd::LIGHT_BREATH:
-        {
-          cmd.rear_mode = BunkerLightCmd::LightMode::BREATH;
-          break;
-        }
-        case bunker_msgs::BunkerLightCmd::LIGHT_CUSTOM:
-        {
-          cmd.rear_mode = BunkerLightCmd::LightMode::CUSTOM;
-          cmd.rear_custom_value = msg->rear_custom_value;
-          break;
-        }
-        }
+//        switch (msg->rear_mode)
+//        {
+//        case bunker_msgs::BunkerLightCmd::LIGHT_CONST_OFF:
+//        {
+//          cmd.rear_mode = BunkerLightCmd::LightMode::CONST_OFF;
+//          break;
+//        }
+//        case bunker_msgs::BunkerLightCmd::LIGHT_CONST_ON:
+//        {
+//          cmd.rear_mode = BunkerLightCmd::LightMode::CONST_ON;
+//          break;
+//        }
+//        case bunker_msgs::BunkerLightCmd::LIGHT_BREATH:
+//        {
+//          cmd.rear_mode = BunkerLightCmd::LightMode::BREATH;
+//          break;
+//        }
+//        case bunker_msgs::BunkerLightCmd::LIGHT_CUSTOM:
+//        {
+//          cmd.rear_mode = BunkerLightCmd::LightMode::CUSTOM;
+//          cmd.rear_custom_value = msg->rear_custom_value;
+//          break;
+//        }
+//        }
 
-        bunker_->SetLightCommand(cmd);
-      }
-      else
-      {
-        bunker_->DisableLightCmdControl();
-      }
-    }
-    else
-    {
-      std::cout << "simulated robot received light control cmd" << std::endl;
-    }
-  }
+//        bunker_->SetLightCommand(cmd);
+//      }
+//      else
+//      {
+//        bunker_->DisableLightCmdControl();
+//      }
+//    }
+//    else
+//    {
+//      std::cout << "simulated robot received light control cmd" << std::endl;
+//    }
+//  }
 
   void BunkerROSMessenger::PublishStateToROS()
   {
