@@ -12,27 +12,27 @@
 #include <tf/transform_broadcaster.h>
 
 #include "bunker_msgs/BunkerStatus.h"
+//#include "bunker_msgs/BunkerLightCmd.h"
+
 
 namespace westonrobot
 {
   BunkerROSMessenger::BunkerROSMessenger(ros::NodeHandle *nh)
       : bunker_(nullptr), nh_(nh) {}
 
-  BunkerROSMessenger::BunkerROSMessenger(BunkerBase *bunker, ros::NodeHandle *nh)
+  BunkerROSMessenger::BunkerROSMessenger(BunkerRobot *bunker, ros::NodeHandle *nh)
       : bunker_(bunker), nh_(nh) {}
 
   void BunkerROSMessenger::SetupSubscription()
   {
     // odometry publisher
     odom_publisher_ = nh_->advertise<nav_msgs::Odometry>(odom_topic_name_, 50);
-    status_publisher_ =
-        nh_->advertise<bunker_msgs::BunkerStatus>("/bunker_status", 10);
+    status_publisher_ = nh_->advertise<bunker_msgs::BunkerStatus>("/bunker_status", 10);
 
     // cmd subscriber
     motion_cmd_subscriber_ = nh_->subscribe<geometry_msgs::Twist>(
         "/cmd_vel", 5, &BunkerROSMessenger::TwistCmdCallback, this);
-//    light_cmd_subscriber_ = nh_->subscribe<bunker_msgs::BunkerLightCmd>(
-//        "/bunker_light_control", 5, &BunkerROSMessenger::LightCmdCallback, this);
+
   }
 
   void BunkerROSMessenger::TwistCmdCallback(
@@ -58,77 +58,7 @@ namespace westonrobot
     angular = current_twist_.angular.z;
   }
 
-//  void BunkerROSMessenger::LightCmdCallback(
-//      const bunker_msgs::BunkerLightCmd::ConstPtr &msg)
-//  {
-//    if (!simulated_robot_)
-//    {
-//      if (msg->enable_cmd_light_control)
-//      {
-//        BunkerLightCmd cmd;
 
-//        switch (msg->front_mode)
-//        {
-//        case bunker_msgs::BunkerLightCmd::LIGHT_CONST_OFF:
-//        {
-//          cmd.front_mode = BunkerLightCmd::LightMode::CONST_OFF;
-//          break;
-//        }
-//        case bunker_msgs::BunkerLightCmd::LIGHT_CONST_ON:
-//        {
-//          cmd.front_mode = BunkerLightCmd::LightMode::CONST_ON;
-//          break;
-//        }
-//        case bunker_msgs::BunkerLightCmd::LIGHT_BREATH:
-//        {
-//          cmd.front_mode = BunkerLightCmd::LightMode::BREATH;
-//          break;
-//        }
-//        case bunker_msgs::BunkerLightCmd::LIGHT_CUSTOM:
-//        {
-//          cmd.front_mode = BunkerLightCmd::LightMode::CUSTOM;
-//          cmd.front_custom_value = msg->front_custom_value;
-//          break;
-//        }
-//        }
-
-//        switch (msg->rear_mode)
-//        {
-//        case bunker_msgs::BunkerLightCmd::LIGHT_CONST_OFF:
-//        {
-//          cmd.rear_mode = BunkerLightCmd::LightMode::CONST_OFF;
-//          break;
-//        }
-//        case bunker_msgs::BunkerLightCmd::LIGHT_CONST_ON:
-//        {
-//          cmd.rear_mode = BunkerLightCmd::LightMode::CONST_ON;
-//          break;
-//        }
-//        case bunker_msgs::BunkerLightCmd::LIGHT_BREATH:
-//        {
-//          cmd.rear_mode = BunkerLightCmd::LightMode::BREATH;
-//          break;
-//        }
-//        case bunker_msgs::BunkerLightCmd::LIGHT_CUSTOM:
-//        {
-//          cmd.rear_mode = BunkerLightCmd::LightMode::CUSTOM;
-//          cmd.rear_custom_value = msg->rear_custom_value;
-//          break;
-//        }
-//        }
-
-//        bunker_->SetLightCommand(cmd);
-//      }
-//      else
-//      {
-//        bunker_->DisableLightCmdControl();
-//      }
-//    }
-//    else
-//    {
-//      std::cout << "simulated robot received light control cmd" << std::endl;
-//    }
-//  }
 
   void BunkerROSMessenger::PublishStateToROS()
   {
@@ -142,40 +72,46 @@ namespace westonrobot
       init_run = false;
       return;
     }
-
-    auto state = bunker_->GetBunkerState();
-
+   
+    //auto state = bunker_->GetBunkerState();
+    auto robot_state = bunker_->GetRobotState();
+    auto actuator_state = bunker_->GetActuatorState();
     // publish bunker state message
     bunker_msgs::BunkerStatus status_msg;
 
     status_msg.header.stamp = current_time_;
 
-    status_msg.linear_velocity = state.linear_velocity;
-    status_msg.angular_velocity = state.angular_velocity;
+    status_msg.linear_velocity = robot_state.motion_state.linear_velocity;
+    status_msg.angular_velocity = robot_state.motion_state.angular_velocity;
+    status_msg.base_state = robot_state.system_state.vehicle_state;
+    status_msg.control_mode = robot_state.system_state.control_mode;
+    status_msg.fault_code = robot_state.system_state.error_code;
+    status_msg.battery_voltage = robot_state.system_state.battery_voltage;
 
-    status_msg.base_state = state.base_state;
-    status_msg.control_mode = state.control_mode;
-    status_msg.fault_code = state.fault_code;
-    status_msg.battery_voltage = state.battery_voltage;
-
-    for (int i = 0; i < 2; ++i)
+    if(bunker_->GetParserProtocolVersion() == ProtocolVersion::AGX_V1)
     {
-      status_msg.motor_states[i].current = state.actuator_states[i].motor_current;
-      status_msg.motor_states[i].rpm = state.actuator_states[i].motor_rpm;
-      status_msg.motor_states[i].temperature = state.actuator_states[i].driver_temperature;
+        for (int i = 0; i < 2; ++i)
+        {
+            status_msg.motor_states[i].current = actuator_state.actuator_state[i].current;
+            status_msg.motor_states[i].rpm = actuator_state.actuator_state[i].rpm;
+            status_msg.motor_states[i].temperature = actuator_state.actuator_state[i].motor_temp;
+        }
     }
+    else
+    {
+        for (int i = 0; i < 2; ++i)
+        {
+            status_msg.motor_states[i].current = actuator_state.actuator_hs_state[i].current;
+            status_msg.motor_states[i].rpm = actuator_state.actuator_hs_state[i].rpm;
+            status_msg.motor_states[i].temperature = actuator_state.actuator_ls_state[i].motor_temp;
+        }
 
-    status_msg.light_control_enabled = state.light_control_enabled;
-    status_msg.front_light_state.mode = state.front_light_state.mode;
-    status_msg.front_light_state.custom_value =
-        state.front_light_state.custom_value;
-    status_msg.rear_light_state.mode = state.rear_light_state.mode;
-    status_msg.rear_light_state.custom_value =
-        state.front_light_state.custom_value;
+
+    }
     status_publisher_.publish(status_msg);
 
     // publish odometry and tf
-    PublishOdometryToROS(state.linear_velocity, state.angular_velocity, dt);
+    PublishOdometryToROS(robot_state.motion_state.linear_velocity, robot_state.motion_state.angular_velocity, dt);
 
     // record time for next integration
     last_time_ = current_time_;
@@ -216,7 +152,7 @@ namespace westonrobot
     //     state.motor_states[i].temperature;
     // }
 
-    status_msg.light_control_enabled = false;
+   //status_msg.light_control_enabled = false;
     // status_msg.front_light_state.mode = state.front_light_state.mode;
     // status_msg.front_light_state.custom_value =
     // state.front_light_state.custom_value; status_msg.rear_light_state.mode =

@@ -5,16 +5,19 @@
 #include <sensor_msgs/JointState.h>
 #include <tf/transform_broadcaster.h>
 
-#include "ugv_sdk/bunker/bunker_base.hpp"
+#include "ugv_sdk/utilities/protocol_detector.hpp"
+#include "ugv_sdk/mobile_robot/bunker_robot.hpp"
+//#include "ugv_sdk/bunker/bunker_base.hpp"
 #include "bunker_base/bunker_messenger.hpp"
 
 using namespace westonrobot;
 
-std::shared_ptr<BunkerBase> robot;
+std::shared_ptr<BunkerRobot> robot;
 
 void DetachRobot(int signal) {
-  robot->Disconnect();
-  robot->Terminate();
+  // robot->Disconnect();
+  // robot->Terminate();
+  robot->DisableLightControl();
 }
 
 int main(int argc, char **argv) {
@@ -28,11 +31,33 @@ int main(int argc, char **argv) {
   bool is_bunker_mini = false;
   private_node.param<bool>("is_bunker_mini", is_bunker_mini, false);
   std::cout << "Working as bunker mini: " << is_bunker_mini << std::endl;
-
+  
   // instantiate a robot object
+  std::unique_ptr<BunkerRobot> bunker;
   //robot = std::make_shared<BunkerBase>(is_bunker_mini);
-  BunkerBase robot;
-  BunkerROSMessenger messenger(&robot, &node);
+  ProtocolDectctor detector;
+  detector.Connect("can0");
+  auto proto = detector.DetectProtocolVersion(5);
+  if (proto == ProtocolVersion::AGX_V1) {
+    std::cout << "Detected protocol: AGX_V1" << std::endl;
+    bunker = std::unique_ptr<BunkerRobot>(
+    new BunkerRobot(ProtocolVersion::AGX_V1));
+  } 
+  else if (proto == ProtocolVersion::AGX_V2) 
+  {
+    std::cout << "Detected protocol: AGX_V2" << std::endl;
+    bunker = std::unique_ptr<BunkerRobot>(
+    new BunkerRobot(ProtocolVersion::AGX_V2));
+  }
+   else
+   {
+    std::cout << "Detected protocol: UNKONWN" << std::endl;
+    return -1;
+  }
+  if (bunker == nullptr)
+    std::cout << "Failed to create robot object" << std::endl;
+    
+  BunkerROSMessenger messenger(bunker.get(), &node);
 
   // fetch parameters before connecting to robot
   std::string port_name;
@@ -50,10 +75,11 @@ int main(int argc, char **argv) {
   if (!messenger.simulated_robot_) {
     // connect to robot and setup ROS subscription
     if (port_name.find("can") != std::string::npos) {
-      robot.Connect(port_name);
+      bunker->Connect(port_name);
+      bunker->EnableCommandedMode();
       ROS_INFO("Using CAN bus to talk with the robot");
     } else {
-      robot.Connect(port_name, 115200);
+      bunker->Connect(port_name);
       ROS_INFO("Using UART to talk with the robot");
     }
   }

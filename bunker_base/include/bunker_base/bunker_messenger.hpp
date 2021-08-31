@@ -18,7 +18,8 @@
 #include <tf2_ros/transform_broadcaster.h>
 
 #include "bunker_msgs/BunkerLightCmd.h"
-#include "ugv_sdk/bunker/bunker_base.hpp"
+#include "ugv_sdk/mobile_robot/bunker_robot.hpp"
+#include <mutex>
 
 namespace westonrobot
 {
@@ -26,7 +27,7 @@ class BunkerROSMessenger
 {
 public:
     explicit BunkerROSMessenger(ros::NodeHandle *nh);
-    BunkerROSMessenger(BunkerBase *bunker, ros::NodeHandle *nh);
+    BunkerROSMessenger(BunkerRobot *bunker, ros::NodeHandle *nh);
 
     std::string odom_frame_;
     std::string base_frame_;
@@ -43,9 +44,9 @@ public:
     void GetCurrentMotionCmdForSim(double &linear, double &angular);
 
 private:
-    BunkerBase *bunker_;
+    BunkerRobot *bunker_;
     ros::NodeHandle *nh_;
-
+    
     std::mutex twist_mutex_;
     geometry_msgs::Twist current_twist_;
 

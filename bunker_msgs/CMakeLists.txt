@@ -49,8 +49,7 @@ add_message_files(
     FILES
     BunkerStatus.msg
     BunkerMotorState.msg
-    BunkerLightState.msg
-    BunkerLightCmd.msg
+
 )
 
 

@@ -19,9 +19,9 @@ uint16 fault_code
 float64 battery_voltage
 
 # motor state
-BunkerMotorState[4] motor_states
+BunkerMotorState[2] motor_states
 
 # light state
-bool light_control_enabled
-BunkerLightState front_light_state
-BunkerLightState rear_light_state
+#bool light_control_enabled
+#BunkerLightState front_light_state
+#BunkerLightState rear_light_state
