@@ -17,7 +17,6 @@
 // #include <tf/transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
 
-#include "bunker_msgs/BunkerLightCmd.h"
 #include "ugv_sdk/mobile_robot/bunker_robot.hpp"
 #include <mutex>
 
@@ -53,7 +52,6 @@ private:
     ros::Publisher odom_publisher_;
     ros::Publisher status_publisher_;
     ros::Subscriber motion_cmd_subscriber_;
-    ros::Subscriber light_cmd_subscriber_;
     tf2_ros::TransformBroadcaster tf_broadcaster_;
 
     // speed variables
@@ -67,7 +65,6 @@ private:
     ros::Time current_time_;
 
     void TwistCmdCallback(const geometry_msgs::Twist::ConstPtr &msg);
-    void LightCmdCallback(const bunker_msgs::BunkerLightCmd::ConstPtr &msg);
     void PublishOdometryToROS(double linear, double angular, double dt);
 };
 } // namespace westonrobot

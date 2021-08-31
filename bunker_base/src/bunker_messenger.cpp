@@ -133,32 +133,13 @@ namespace westonrobot
 
     // publish bunker state message
     bunker_msgs::BunkerStatus status_msg;
-
     status_msg.header.stamp = current_time_;
-
     status_msg.linear_velocity = linear;
     status_msg.angular_velocity = angular;
-
     status_msg.base_state = 0x00;
     status_msg.control_mode = 0x01;
     status_msg.fault_code = 0x00;
     status_msg.battery_voltage = 29.5;
-
-    // for (int i = 0; i < 4; ++i)
-    // {
-    //     status_msg.motor_states[i].current = state.motor_states[i].current;
-    //     status_msg.motor_states[i].rpm = state.motor_states[i].rpm;
-    //     status_msg.motor_states[i].temperature =
-    //     state.motor_states[i].temperature;
-    // }
-
-   //status_msg.light_control_enabled = false;
-    // status_msg.front_light_state.mode = state.front_light_state.mode;
-    // status_msg.front_light_state.custom_value =
-    // state.front_light_state.custom_value; status_msg.rear_light_state.mode =
-    // state.rear_light_state.mode; status_msg.rear_light_state.custom_value =
-    // state.front_light_state.custom_value;
-
     status_publisher_.publish(status_msg);
 
     // publish odometry and tf
