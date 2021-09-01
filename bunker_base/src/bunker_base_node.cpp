@@ -79,7 +79,6 @@ int main(int argc, char **argv) {
       bunker->EnableCommandedMode();
       ROS_INFO("Using CAN bus to talk with the robot");
     } else {
-      bunker->Connect(port_name);
       ROS_INFO("Using UART to talk with the robot");
     }
   }
