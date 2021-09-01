@@ -6,7 +6,6 @@ This repository contains minimal packages to control the bunker robot using ROS.
 
 * bunker_bringup: launch and configuration files to start ROS nodes
 * bunker_base: a ROS wrapper around [ugv_sdk](https://github.com/agilexrobotics/ugv_sdk) to monitor and control the bunker robot
-* bunker_description: URDF model for the mobile base, a sample urdf (bunker_description/sample/bunker_v2_nav.xacro) is provided for customized robot with addtional sensors
 * bunker_msgs: bunker related message definitions
 
 ### Update the packages for your customized robot
@@ -22,7 +21,7 @@ The nodes in this ROS package are made to handle only the control of the bunker 
 **Alternative odometry calculation**
 
 By default the bunker_base package will publish odometry message to topic "/odom". In case you want to use a different approach to calculate the odometry, for example estimating the position together with an IMU, you could rename the default odometry topic to be something else.
- 
+
 ```
 $ bunker_bringup bunker_minimal.launch odom_topic_name:="<custom_name>"
 ```
@@ -49,21 +48,44 @@ Nvidia Jeston TX2/Xavier/XavierNX have CAN controller(s) integrated in the main 
 
     ```
     $ cd ~/catkin_ws/src
-    $ git clone --recursive https://github.com/agilexrobotics/ugv_sdk.git
+    $ git clone  https://github.com/agilexrobotics/ugv_sdk.git
     $ git clone https://github.com/agilexrobotics/bunker_ros.git
     $ cd ..
     $ catkin_make
     ```
 
+3. Setup CAN-To-USB adapter
+
+* Enable gs_usb kernel module(If you have already added this module, you do not need to add it)
+    ```
+    $ sudo modprobe gs_usb
+    ```
+    
+* first time use hunter-ros package
+   ```
+   $ rosrun hunter_bringup setup_can2usb.bash
+   ```
+   
+* if not the first time use hunter-ros package(Run this command every time you turn off the power) 
+   ```
+   $ rosrun hunter_bringup bringup_can2usb.bash
+   ```
+   
+* Testing command
+    ```
+    # receiving data from can0
+    $ candump can0
+    ```
+
 4. Launch ROS nodes
- 
+
 * Start the base node for the real robot
 
     ```
-    $ roslaunch bunker_bringup bunker_minimal.launch
+    $ roslaunch bunker_bringup bunker_robot_base.launch
     ```
 
-    The [bunker_bringup/bunker_minimal.launch](bunker_bringup/launch/bunker_minimal.launch) has 4 parameters:
+    The [bunker_bringup/bunker_robot_base.launch](bunker_bringup/launch/bunker_robot_base.launch) has 4 parameters:
 
     - port_name: specifies the port used to communicate with the robot, default = "can0"
 
