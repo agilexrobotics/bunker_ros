@@ -36,26 +36,35 @@ int main(int argc, char **argv) {
   std::unique_ptr<BunkerRobot> bunker;
   //robot = std::make_shared<BunkerBase>(is_bunker_mini);
   ProtocolDectctor detector;
-  detector.Connect("can0");
-  auto proto = detector.DetectProtocolVersion(5);
-  if (proto == ProtocolVersion::AGX_V1) {
-    std::cout << "Detected protocol: AGX_V1" << std::endl;
-    bunker = std::unique_ptr<BunkerRobot>(
-    new BunkerRobot(ProtocolVersion::AGX_V1));
-  } 
-  else if (proto == ProtocolVersion::AGX_V2) 
+  try
   {
-    std::cout << "Detected protocol: AGX_V2" << std::endl;
-    bunker = std::unique_ptr<BunkerRobot>(
-    new BunkerRobot(ProtocolVersion::AGX_V2));
+      detector.Connect("can0");
+      auto proto = detector.DetectProtocolVersion(5);
+      if (proto == ProtocolVersion::AGX_V1) {
+        std::cout << "Detected protocol: AGX_V1" << std::endl;
+        bunker = std::unique_ptr<BunkerRobot>(
+        new BunkerRobot(ProtocolVersion::AGX_V1));
+      }
+      else if (proto == ProtocolVersion::AGX_V2)
+      {
+        std::cout << "Detected protocol: AGX_V2" << std::endl;
+        bunker = std::unique_ptr<BunkerRobot>(
+        new BunkerRobot(ProtocolVersion::AGX_V2));
+      }
+       else
+       {
+        std::cout << "Detected protocol: UNKONWN" << std::endl;
+        return -1;
+      }
+      if (bunker == nullptr)
+        std::cout << "Failed to create robot object" << std::endl;
   }
-   else
-   {
-    std::cout << "Detected protocol: UNKONWN" << std::endl;
-    return -1;
+  catch (std::exception error)
+  {
+      ROS_ERROR("please bringup up can or make sure can port exist");
+      ros::shutdown();
   }
-  if (bunker == nullptr)
-    std::cout << "Failed to create robot object" << std::endl;
+
     
   BunkerROSMessenger messenger(bunker.get(), &node);
 
