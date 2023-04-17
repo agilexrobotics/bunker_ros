@@ -67,14 +67,14 @@ Nvidia Jeston TX2/Xavier/XavierNX have CAN controller(s) integrated in the main 
     $ sudo modprobe gs_usb
     ```
     
-* first time use hunter-ros package
+* first time use bunker-ros package
    ```
-   $ rosrun hunter_bringup setup_can2usb.bash
+   $ rosrun bunker_bringup setup_can2usb.bash
    ```
    
-* if not the first time use hunter-ros package(Run this command every time you turn off the power) 
+* if not the first time use bunker-ros package(Run this command every time you turn off the power) 
    ```
-   $ rosrun hunter_bringup bringup_can2usb.bash
+   $ rosrun bunker_bringup bringup_can2usb.bash
    ```
    
 * Testing command
