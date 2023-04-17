@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
   // instantiate a robot object
   std::unique_ptr<BunkerRobot> bunker;
   //robot = std::make_shared<BunkerBase>(is_bunker_mini);
-  ProtocolDectctor detector;
+  ProtocolDetector detector;
   try
   {
       detector.Connect("can0");
