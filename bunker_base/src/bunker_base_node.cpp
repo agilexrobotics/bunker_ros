@@ -17,7 +17,7 @@ std::shared_ptr<BunkerRobot> robot;
 void DetachRobot(int signal) {
   // robot->Disconnect();
   // robot->Terminate();
-  robot->DisableLightControl();
+  // robot->DisableLightControl();
 }
 
 int main(int argc, char **argv) {
