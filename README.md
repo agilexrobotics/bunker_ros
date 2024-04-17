@@ -82,7 +82,15 @@ Nvidia Jeston TX2/Xavier/XavierNX have CAN controller(s) integrated in the main 
     # receiving data from can0
     $ candump can0
     ```
-
+* The ROS environment is set up to handle password prompts, or configure sudo to allow these commands to execute without a password. This can be done by editing the sudoers file (using sudo visudo) like so:
+  ```
+    $ sudo visudo
+  ```
+* And adding a line for specific commands to be run without a password:
+  ```
+    <username> ALL=(ALL) NOPASSWD: /sbin/modprobe, /sbin/ip link set can0 up type can bitrate 500000
+  ```
+  
 4. Launch ROS nodes
 
 * Start the base node for the real robot
