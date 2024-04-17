@@ -82,8 +82,10 @@ Nvidia Jeston TX2/Xavier/XavierNX have CAN controller(s) integrated in the main 
     # receiving data from can0
     $ candump can0
     ```
-**Alternatives:**
-1. Add into bunker_robot_base.launch:
+---------------------------------------------------------------------------------
+
+**Alternatives to 3:**
+1) Add into bunker_robot_base.launch:
 ```
 <node name="setup_can_interface" pkg="bunker_bringup" type="bringup_can2usb.bash" output="screen" />
 ```
@@ -96,8 +98,8 @@ Nvidia Jeston TX2/Xavier/XavierNX have CAN controller(s) integrated in the main 
     <username> ALL=(ALL) NOPASSWD: /sbin/modprobe, /sbin/ip link set can0 up type can bitrate 500000
   ```
 OR
-2. 
-Run the shellscript:
+
+2) Run the shellscript:
 ```
 $ sudo ./bunker_pro.sh
 ```
@@ -108,7 +110,8 @@ source /opt/ros/noetic/setup.bash
 # Replace '/home/ara/bunker_ws' with your actual ROS ws path.
 source /home/ara/bunker_ws/devel/setup.bash
 ```
-  
+---------------------------------------------------------------------------------
+
 4. Launch ROS nodes
 
 * Start the base node for the real robot
