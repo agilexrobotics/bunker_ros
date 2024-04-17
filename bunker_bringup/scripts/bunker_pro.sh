@@ -7,8 +7,9 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # Source the ROS environment
-# Replace '/opt/ros/melodic' with your actual ROS distribution path.
+# Replace '/opt/ros/noetic' with your actual ROS distribution path.
 source /opt/ros/noetic/setup.bash
+# Replace '/home/ara/bunker_ws' with your actual ROS ws path.
 source /home/ara/bunker_ws/devel/setup.bash
 
 # Load the gs_usb kernel module if not already loaded
