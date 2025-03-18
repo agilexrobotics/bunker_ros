@@ -13,7 +13,7 @@
 
 #include "bunker_msgs/BunkerStatus.h"
 //#include "bunker_msgs/BunkerLightCmd.h"
-
+#include "bunker_msgs/BunkerRsStatus.h"
 
 namespace westonrobot
 {
@@ -28,6 +28,7 @@ namespace westonrobot
     // odometry publisher
     odom_publisher_ = nh_->advertise<nav_msgs::Odometry>(odom_topic_name_, 50);
     status_publisher_ = nh_->advertise<bunker_msgs::BunkerStatus>("/bunker_status", 10);
+    rs_status_publisher_ = nh_->advertise<bunker_msgs::BunkerRsStatus>("/rs_status",10);
 
     // cmd subscriber
     motion_cmd_subscriber_ = nh_->subscribe<geometry_msgs::Twist>(
@@ -78,6 +79,7 @@ namespace westonrobot
     auto actuator_state = bunker_->GetActuatorState();
     // publish bunker state message
     bunker_msgs::BunkerStatus status_msg;
+    bunker_msgs::BunkerRsStatus rs_status_msg;
 
     status_msg.header.stamp = current_time_;
 
@@ -87,6 +89,19 @@ namespace westonrobot
     status_msg.control_mode = robot_state.system_state.control_mode;
     status_msg.fault_code = robot_state.system_state.error_code;
     status_msg.battery_voltage = robot_state.system_state.battery_voltage;
+
+    rs_status_msg.header.stamp = current_time_;
+    rs_status_msg.stick_left_h = robot_state.rc_state.stick_left_h;
+    rs_status_msg.stick_left_v = robot_state.rc_state.stick_left_v;
+    rs_status_msg.stick_right_h = robot_state.rc_state.stick_right_h;
+    rs_status_msg.stick_right_v = robot_state.rc_state.stick_right_v;
+
+    rs_status_msg.swa = robot_state.rc_state.swa;
+    rs_status_msg.swb = robot_state.rc_state.swb;
+    rs_status_msg.swc = robot_state.rc_state.swc;
+    rs_status_msg.swd = robot_state.rc_state.swd;
+
+    rs_status_msg.var_a = robot_state.rc_state.var_a;
 
     if(bunker_->GetParserProtocolVersion() == ProtocolVersion::AGX_V1)
     {
@@ -109,6 +124,8 @@ namespace westonrobot
 
     }
     status_publisher_.publish(status_msg);
+    rs_status_publisher_.publish(rs_status_msg);
+
 
     // publish odometry and tf
     PublishOdometryToROS(robot_state.motion_state.linear_velocity, robot_state.motion_state.angular_velocity, dt);
