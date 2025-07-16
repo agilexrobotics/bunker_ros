@@ -12,7 +12,7 @@
 #include <tf/transform_broadcaster.h>
 
 #include "bunker_msgs/BunkerStatus.h"
-//#include "bunker_msgs/BunkerLightCmd.h"
+#include "bunker_msgs/BunkerBmsStatus.h"
 #include "bunker_msgs/BunkerRsStatus.h"
 
 namespace westonrobot
@@ -29,6 +29,7 @@ namespace westonrobot
     odom_publisher_ = nh_->advertise<nav_msgs::Odometry>(odom_topic_name_, 50);
     status_publisher_ = nh_->advertise<bunker_msgs::BunkerStatus>("/bunker_status", 10);
     rs_status_publisher_ = nh_->advertise<bunker_msgs::BunkerRsStatus>("/rs_status",10);
+    BMS_status_publisher_ = nh_->advertise<bunker_msgs::BunkerBmsStatus>("/bms_status_msg", 10);
 
     // cmd subscriber
     motion_cmd_subscriber_ = nh_->subscribe<geometry_msgs::Twist>(
@@ -77,9 +78,12 @@ namespace westonrobot
     //auto state = bunker_->GetBunkerState();
     auto robot_state = bunker_->GetRobotState();
     auto actuator_state = bunker_->GetActuatorState();
+    auto bms_state = BunkerCommonSensorState();
+
     // publish bunker state message
     bunker_msgs::BunkerStatus status_msg;
     bunker_msgs::BunkerRsStatus rs_status_msg;
+    bunker_msgs::BunkerBmsStatus bms_status_msg;
 
     status_msg.header.stamp = current_time_;
 
@@ -103,6 +107,17 @@ namespace westonrobot
 
     rs_status_msg.var_a = robot_state.rc_state.var_a;
 
+    bms_status_msg.SOC = bms_state.bms_basic_state.battery_soc;
+    bms_status_msg.SOH = bms_state.bms_basic_state.battery_soh;
+    bms_status_msg.battery_voltage = bms_state.bms_basic_state.voltage;
+    bms_status_msg.battery_current = bms_state.bms_basic_state.current;
+    bms_status_msg.battery_temperature = bms_state.bms_basic_state.temperature;
+    bms_status_msg.Alarm_Status_1 = bms_state.bms_extended_state.alarm_status_1;
+    bms_status_msg.Alarm_Status_2 = bms_state.bms_extended_state.alarm_status_2;
+    bms_status_msg.Warning_Status_1 = bms_state.bms_extended_state.warn_status_1;
+    bms_status_msg.Warning_Status_2 = bms_state.bms_extended_state.warn_status_2;
+
+
     if(bunker_->GetParserProtocolVersion() == ProtocolVersion::AGX_V1)
     {
         for (int i = 0; i < 2; ++i)
@@ -120,9 +135,9 @@ namespace westonrobot
             status_msg.motor_states[i].rpm = actuator_state.actuator_hs_state[i].rpm;
             status_msg.motor_states[i].temperature = actuator_state.actuator_ls_state[i].motor_temp;
         }
-
-
     }
+
+    BMS_status_publisher_.publish(bms_status_msg);
     status_publisher_.publish(status_msg);
     rs_status_publisher_.publish(rs_status_msg);
 

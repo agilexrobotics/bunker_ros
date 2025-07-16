@@ -50,6 +50,7 @@ add_message_files(
     BunkerStatus.msg
     BunkerMotorState.msg
     BunkerRsStatus.msg
+    BunkerBmsStatus.msg
 )
 
 
