@@ -8,6 +8,8 @@
     <arg name="is_bunker_mini" default="false" />
     <arg name="pub_tf" default="true" />
 
+    <node name="setup_can_interface" pkg="bunker_bringup" type="bringup_can2usb.bash" output="screen" />
+
     <include file="$(find bunker_base)/launch/bunker_base.launch">
         <arg name="port_name" default="$(arg port_name)" />
         <arg name="simulated_robot" default="$(arg simulated_robot)" />
