@@ -129,7 +129,7 @@ namespace westonrobot
     }
     else
     {
-        for (int i = 0; i < 2; ++i)
+        for (int i = 0; i < 3; ++i)
         {
             status_msg.motor_states[i].current = actuator_state.actuator_hs_state[i].current;
             status_msg.motor_states[i].rpm = actuator_state.actuator_hs_state[i].rpm;
