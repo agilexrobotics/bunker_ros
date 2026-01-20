@@ -82,6 +82,35 @@ Nvidia Jeston TX2/Xavier/XavierNX have CAN controller(s) integrated in the main 
     # receiving data from can0
     $ candump can0
     ```
+---------------------------------------------------------------------------------
+
+**Alternatives to 3:**
+1) Add into bunker_robot_base.launch:
+```
+<node name="setup_can_interface" pkg="bunker_bringup" type="bringup_can2usb.bash" output="screen" />
+```
+* The ROS environment is set up to handle password prompts, or configure sudo to allow these commands to execute without a password. This can be done by editing the sudoers file (using sudo visudo) like so:
+  ```
+    $ sudo visudo
+  ```
+* And adding a line for specific commands to be run without a password:
+  ```
+    <username> ALL=(ALL) NOPASSWD: /sbin/modprobe, /sbin/ip link set can0 up type can bitrate 500000
+  ```
+OR
+
+2) Run the shellscript:
+```
+$ sudo ./bunker_pro.sh
+```
+*Note*: modify bunker_pro.sh:
+```
+# Replace '/opt/ros/noetic' with your actual ROS distribution path.
+source /opt/ros/noetic/setup.bash
+# Replace '/home/ara/bunker_ws' with your actual ROS ws path.
+source /home/ara/bunker_ws/devel/setup.bash
+```
+---------------------------------------------------------------------------------
 
 4. Launch ROS nodes
 
